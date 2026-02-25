@@ -57,7 +57,7 @@ def handler(event: dict, context) -> dict:
             'Authorization': f"Bearer {os.environ['OPENROUTER_API_KEY']}",
             'Content-Type': 'application/json',
             'HTTP-Referer': 'https://poehali.dev',
-            'X-Title': 'sheldyxov'
+            'X-Title': 'poehali'
         },
         method='POST'
     )
