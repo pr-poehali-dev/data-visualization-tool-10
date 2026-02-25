@@ -25,13 +25,17 @@ export default function Hero() {
         />
       </motion.div>
 
-      <div className="relative z-10 text-center text-white">
+      <div className="relative z-10 text-center text-white px-6">
+        <p className="uppercase tracking-widest text-sm mb-4 opacity-70">Всё о кино в одном месте</p>
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
-          ОТКРОЙ
+          CINESCOPE
         </h1>
-        <p className="text-lg md:text-xl max-w-2xl mx-auto px-6 opacity-90">
-          Исследуй границы дизайна с иммерсивным параллакс-эффектом
+        <p className="text-lg md:text-xl max-w-2xl mx-auto opacity-90">
+          Новые фильмы, сериалы и истории актёров — первым узнавай о самом интересном
         </p>
+        <button className="mt-8 border border-white text-white px-8 py-3 uppercase tracking-wide text-sm hover:bg-white hover:text-black transition-all duration-300 cursor-pointer">
+          Смотреть новинки
+        </button>
       </div>
     </div>
   );
