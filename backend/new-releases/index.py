@@ -1,10 +1,10 @@
 import json
 import os
-from openai import OpenAI
+import urllib.request
 from datetime import datetime
 
 def handler(event: dict, context) -> dict:
-    """Возвращает список новинок кино, сериалов и мультфильмов через OpenAI."""
+    """Возвращает список новинок кино, сериалов и мультфильмов через OpenRouter."""
 
     if event.get('httpMethod') == 'OPTIONS':
         return {
@@ -18,41 +18,57 @@ def handler(event: dict, context) -> dict:
             'body': ''
         }
 
-    client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
-
     current_date = datetime.now().strftime("%B %Y")
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
+    payload = json.dumps({
+        "model": "meta-llama/llama-3.3-70b-instruct",
+        "messages": [
             {
                 "role": "system",
                 "content": (
-                    "Ты эксперт по кино. Отвечай ТОЛЬКО валидным JSON без markdown и лишнего текста. "
-                    "Формат ответа: массив объектов с полями: "
+                    "Ты эксперт по кино. Отвечай ТОЛЬКО валидным JSON-массивом без markdown, "
+                    "без ```json, без пояснений — только сырой JSON-массив. "
+                    "Каждый объект имеет поля: "
                     "title (название на русском), "
                     "original_title (оригинальное название), "
                     "type (film/series/cartoon), "
-                    "year (год выхода), "
+                    "year (год выхода, число), "
                     "genre (жанр), "
                     "description (краткое описание 1-2 предложения на русском), "
-                    "rating (рейтинг IMDb или ожидаемый, строка типа '8.2/10')"
+                    "rating (строка, например '8.2/10' или 'ожидается')"
                 )
             },
             {
                 "role": "user",
                 "content": (
-                    f"Сейчас {current_date}. Дай список из 9 самых ожидаемых или недавно вышедших "
-                    "новинок: 3 фильма, 3 сериала и 3 мультфильма. "
-                    "Включай реальные тайтлы 2024-2025 года. Только JSON-массив."
+                    f"Сейчас {current_date}. Дай список из 9 реальных новинок 2024-2025 года: "
+                    "3 фильма, 3 сериала и 3 мультфильма. Только JSON-массив, без лишнего текста."
                 )
             }
         ],
-        temperature=0.7,
-        max_tokens=2000
+        "temperature": 0.7,
+        "max_tokens": 2000
+    }).encode('utf-8')
+
+    req = urllib.request.Request(
+        'https://openrouter.ai/api/v1/chat/completions',
+        data=payload,
+        headers={
+            'Authorization': f"Bearer {os.environ['OPENROUTER_API_KEY']}",
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://poehali.dev',
+            'X-Title': 'sheldyxov'
+        },
+        method='POST'
     )
 
-    content = response.choices[0].message.content.strip()
+    with urllib.request.urlopen(req) as resp:
+        result = json.loads(resp.read().decode('utf-8'))
+
+    content = result['choices'][0]['message']['content'].strip()
+    if content.startswith('```'):
+        content = content.split('\n', 1)[1].rsplit('```', 1)[0].strip()
+
     items = json.loads(content)
 
     return {
