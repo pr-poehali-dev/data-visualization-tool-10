@@ -28,7 +28,7 @@ export default function Hero() {
       <div className="relative z-10 text-center text-white px-6">
         <p className="uppercase tracking-widest text-sm mb-4 opacity-70">Всё о кино в одном месте</p>
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
-          CINESCOPE
+          SHELDYXOV
         </h1>
         <p className="text-lg md:text-xl max-w-2xl mx-auto opacity-90">
           Новые фильмы, сериалы и истории актёров — первым узнавай о самом интересном
